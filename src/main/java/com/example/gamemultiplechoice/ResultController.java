@@ -11,15 +11,20 @@ public class ResultController {
 
     @FXML
     private void initialize(){
-        marks.setText(QuizController.correct + "/2");
+        marks.setText(QuizController.correct + "/5");
 
-        double correct = (double) QuizController.correct/2;
+        double correct = (double) QuizController.correct/5;
         correctQuiz.setProgress(correct);
 
-        double wrong = (double) QuizController.wrong/2;
+        double wrong = (double) QuizController.wrong/5;
         wrongQuiz.setProgress(wrong);
 
-        marksText.setText("Loser");
+        if(wrong <= 4.0){
+            marksText.setText("Loser");
+        }
+        else{
+            marksText.setText("Good");
+        }
 
     }
 }

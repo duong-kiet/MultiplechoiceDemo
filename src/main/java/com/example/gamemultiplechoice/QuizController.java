@@ -8,33 +8,38 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
+import java.sql.Connection;
+import java.util.*;
+
 public class QuizController {
+   Set <Integer> list;
     @FXML
     public Label question;
+    List<Question> questions;
     @FXML
     public Button opt1,opt2,opt3,opt4;
-    int cnt =0;
+    public int cnt = 0;
     static int correct = 0;
     static int wrong = 0;
     @FXML
     private void initialize(){
+        list = new HashSet<>();
         loadQuestions();
     }
     private void loadQuestions() {
-        if(cnt == 0){
-            question.setText("1.Do you love me");
-            opt1.setText("Yes");
-            opt2.setText("Absulutely");
-            opt3.setText("Of course");
-            opt4.setText("Definitely");
-        }
-        if(cnt == 1){
-            question.setText("2.I love you");
-            opt1.setText("Yes");
-            opt2.setText("Absulutely");
-            opt3.setText("Of course");
-            opt4.setText("Definitely");
-        }
+        Connection connection = QuizDatabase.connectToDatabase();
+        QuestionDao questionDAO = new QuestionDao(connection);
+        questions = questionDAO.getAllQuestions();
+
+        //cnt = (int)(Math.random()*10);
+        cnt = random();
+        Question currentQuestion = questions.get(cnt);
+        question.setText(currentQuestion.getQuestionText());
+        opt1.setText(currentQuestion.getOption1());
+        opt2.setText(currentQuestion.getOption2());
+        opt3.setText(currentQuestion.getOption3());
+        opt4.setText(currentQuestion.getOption4());
+
     }
 
     @FXML
@@ -46,7 +51,7 @@ public class QuizController {
             wrong +=1;
         }
 
-        if(cnt == 2){
+        if(cnt == 5){
             try{
                 Stage homeStage = (Stage)((Button) event.getSource()).getScene().getWindow();
                 homeStage.close();
@@ -68,25 +73,6 @@ public class QuizController {
             loadQuestions();
         }
     }
-    boolean checkAnswer(String answer) {
-        if(cnt == 0){
-            if(answer.equals("Yes")){
-                return true;
-            }
-            else{
-                return false;
-            }
-        }
-        if(cnt == 1){
-            if(answer.equals("Yes")){
-                return true;
-            }
-            else{
-                return false;
-            }
-        }
-        return false;
-    }
 
     @FXML
     public void opt2Clicked(ActionEvent event){
@@ -97,7 +83,7 @@ public class QuizController {
             wrong +=1;
         }
 
-        if(cnt == 2){
+        if(cnt == 5){
             try{
                 Stage homeStage = (Stage)((Button) event.getSource()).getScene().getWindow();
                 homeStage.close();
@@ -128,7 +114,7 @@ public class QuizController {
             wrong +=1;
         }
 
-        if(cnt == 2){
+        if(cnt == 5){
             try{
                 Stage homeStage = (Stage)((Button) event.getSource()).getScene().getWindow();
                 homeStage.close();
@@ -159,7 +145,7 @@ public class QuizController {
             wrong +=1;
         }
 
-        if(cnt == 2){
+        if(cnt == 5){
             try{
                 Stage homeStage = (Stage)((Button) event.getSource()).getScene().getWindow();
                 homeStage.close();
@@ -181,4 +167,28 @@ public class QuizController {
             loadQuestions();
         }
     }
+
+    boolean checkAnswer(String answer) {
+
+        Question currentQuestion = questions.get(cnt);
+        String correctAnswer = currentQuestion.getAnswer();
+
+        return answer.equals(correctAnswer);
+    }
+
+    public int random() {
+        Random random = new Random();
+        int min = 0;
+        int max = 9;
+        int num;
+        while(true){
+            num = random.nextInt(max - min + 1) + min;
+            if(!list.contains(num)){
+                break;
+            }
+        }
+        list.add(num);
+        return num;
+    }
+
 }
